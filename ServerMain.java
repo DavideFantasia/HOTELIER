@@ -35,10 +35,6 @@ class ServerMain {
 		try{
             readConfig();
 
-            if(hotelManager.getHotel("Hotel Cagliari 10","Cagliari")!=null){
-                System.out.println("found");
-            }else System.out.println("not found");
-
             serverSocket = new ServerSocket(port);
             Runtime.getRuntime().addShutdownHook(new TerminationHandler(maxDelay, threadPool, serverSocket));
             System.out.printf("[SERVER] In ascolto sulla porta: %d\n", port);
