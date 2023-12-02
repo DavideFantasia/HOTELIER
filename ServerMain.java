@@ -2,6 +2,7 @@ import utils.*;
 
 import java.io.*;
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.concurrent.*;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.*;
 
 class ServerMain {
     public static final String configFile = "server.properties";
-    public static final String passwordFile = "server.password";
+    public static final String passwordFile = "serverPassword.properties";
     public static final String hotelJSON = "Hotels.json";
 
     public static HotelManager hotelManager = new HotelManager(hotelJSON);
@@ -66,6 +67,41 @@ class ServerMain {
         port = Integer.parseInt(prop.getProperty("port"));
         maxDelay = Integer.parseInt(prop.getProperty("maxDelay"));
         input.close();
+    }
+
+    /**
+     * metodo per segnare sul file di config la nuova coppia username, password
+     * @param username
+     * @param password
+     * @return un codice di esito, x: successo, y: username già presente, z:errore
+     */
+    public static synchronized ReturnCode registerUser(String username, String wantedPassword) throws FileNotFoundException, IOException{
+        //prima si controlla se uno user ha già lo stesso nome
+        FileReader input = new FileReader(passwordFile);
+        Properties prop = new Properties();
+        ReturnCode resultCode = ReturnCode.UNKNOW_ERROR;
+
+        prop.load(input);
+        input.close();
+
+        if(prop.getProperty(username)!=null) resultCode = ReturnCode.USER_ALREADY_PRESENT_ERROR;
+        else{
+            try{
+                
+                prop.setProperty(username, Hashing.digestString(wantedPassword));
+                prop.store(new FileWriter(passwordFile),"Coppie User-Password registrate al servizio");
+
+                resultCode = ReturnCode.SUCCESS;
+            }catch(NoSuchAlgorithmException e){
+                resultCode = ReturnCode.HASHING_ERROR;
+            }catch(Exception e){
+                resultCode = ReturnCode.UNKNOW_ERROR;
+            }
+        }
+
+        input.close();
+
+        return resultCode;
     }
 
     // ClientHandler class
