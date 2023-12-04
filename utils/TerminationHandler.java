@@ -9,15 +9,18 @@ import java.util.concurrent.*;
 *Lo scopo e' quello di far terminare il main del server bloccato sulla accept()
 *in attesa di nuove connessioni e chiudere il pool di thread.
 */
+
 public class TerminationHandler extends Thread{
     private int maxDelay;
     private ExecutorService pool;
     private ServerSocket serverSocket;
+    private HotelManager hotelManager;
 
-    public TerminationHandler(int maxDelay, ExecutorService pool, ServerSocket serverSocket){
+    public TerminationHandler(int maxDelay, ExecutorService pool, ServerSocket serverSocket, HotelManager hotelManager){
         this.maxDelay = maxDelay;
         this.pool = pool;
         this.serverSocket = serverSocket;
+        this.hotelManager = hotelManager;
     }
 
     public void run() {
@@ -35,6 +38,9 @@ public class TerminationHandler extends Thread{
                 pool.shutdownNow();
         }
         catch (InterruptedException e){pool.shutdownNow();}
+
+        this.hotelManager.updateHotelInfo();
+
         System.out.println("[SERVER] Terminato.");
     }
  }

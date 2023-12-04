@@ -2,7 +2,6 @@ import utils.*;
 
 import java.io.*;
 import java.net.*;
-import java.security.NoSuchAlgorithmException;
 import java.util.Properties;
 import java.util.concurrent.*;
 
@@ -21,7 +20,6 @@ import java.util.concurrent.*;
 
 class ServerMain {
     public static final String configFile = "server.properties";
-    public static final String passwordFile = "serverPassword.properties";
     public static final String hotelJSON = "Hotels.json";
 
     public static HotelManager hotelManager = new HotelManager(hotelJSON);
@@ -34,10 +32,10 @@ class ServerMain {
 
     public static void main(String[] args){ 
 		try{
-            readConfig();
+            serverBooting();
 
             serverSocket = new ServerSocket(port);
-            Runtime.getRuntime().addShutdownHook(new TerminationHandler(maxDelay, threadPool, serverSocket));
+            Runtime.getRuntime().addShutdownHook(new TerminationHandler(maxDelay, threadPool, serverSocket, hotelManager));
             System.out.printf("[SERVER] In ascolto sulla porta: %d\n", port);
             while (true){
                 Socket socket = null;
@@ -54,6 +52,14 @@ class ServerMain {
  
 	}
 
+    private static void serverBooting() throws Exception{
+        readConfig();
+        //metodo per iniziare la lettura dei dati degli utenti in memoria
+        User.dataBooting(hotelManager);
+        //metodo per iniziare il ranking per le città
+        Ranking.boot(hotelManager);
+    }
+
     /**
      * Metodo che legge il file di configurazione del server.
      * 
@@ -69,52 +75,45 @@ class ServerMain {
         input.close();
     }
 
-    /**
-     * metodo per segnare sul file di config la nuova coppia username, password
-     * @param username
-     * @param password
-     * @return un codice di esito, x: successo, y: username già presente, z:errore
-     */
-    public static synchronized ReturnCode registerUser(String username, String wantedPassword) throws FileNotFoundException, IOException{
-        //prima si controlla se uno user ha già lo stesso nome
-        FileReader input = new FileReader(passwordFile);
-        Properties prop = new Properties();
-        ReturnCode resultCode = ReturnCode.UNKNOW_ERROR;
-
-        prop.load(input);
-        input.close();
-
-        if(prop.getProperty(username)!=null) resultCode = ReturnCode.USER_ALREADY_PRESENT_ERROR;
-        else{
-            try{
-                
-                prop.setProperty(username, Hashing.digestString(wantedPassword));
-                prop.store(new FileWriter(passwordFile),"Coppie User-Password registrate al servizio");
-
-                resultCode = ReturnCode.SUCCESS;
-            }catch(NoSuchAlgorithmException e){
-                resultCode = ReturnCode.HASHING_ERROR;
-            }catch(Exception e){
-                resultCode = ReturnCode.UNKNOW_ERROR;
-            }
+    public static void ReturnCodeHandler(ReturnCode code){
+        switch (code) {
+            case SUCCESS:
+                System.out.println("Operazione completata con successo");
+                break;
+            case USER_ALREADY_PRESENT_ERROR:
+                System.out.println("Utente già presente, errore");
+                break;
+            case HASHING_ERROR:
+                System.out.println("Errore durante l'hashing");
+                break;
+            case NOT_LOGGEDIN_ERROR:
+                System.out.println("Non autenticato, errore");
+                break;
+            case NO_SUCH_HOTEL_ERROR:
+                System.out.println("Nessun hotel trovato, errore");
+                break;
+            case UNKNOW_ERROR:
+                System.out.println("Errore sconosciuto");
+                break;
+            default:
+                System.out.println("Codice non gestito");
+                break;
         }
-
-        input.close();
-
-        return resultCode;
     }
 
     // ClientHandler class
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
+        private User userIstance;
 
         // Constructor
         public ClientHandler(Socket socket) {
             this.clientSocket = socket;
+            this.userIstance = null;
         }
 
         public void run() {
-            
+            ;
         }
     }
 }

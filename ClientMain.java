@@ -28,7 +28,7 @@ public class ClientMain {
 
         /**
          * Prova a registrare l'utente con la coppia {@code <username, password>} sul servizio. Se la registrazione non va a buon fine viene
-         * ritornato un valore diverso dallo zero (0)
+         * ritornato codice di errore
          * Cambia lo stato della variabile booleana {@code loggedInStatus} in true se l'operazione va a buon fine
          *
          * @param username lo username scelto dall'utente con cui registrarsi sul portale

@@ -12,8 +12,8 @@ public class Hotel implements Comparable<Hotel>{
     private String city;
     private String phone;
     private String[] services;
-    private int rate;
-    private Map<String, Integer> ratings;
+    private double rate;
+    private Map<String, Double> ratings;
 
     public int getId() {
         return id;
@@ -71,20 +71,20 @@ public class Hotel implements Comparable<Hotel>{
     }
 
     // Getter e setter per il tasso
-    public int getRate() {
+    public double getRate() {
         return rate;
     }
 
-    public void setRate(int rate) {
+    public void setRate(double rate) {
         this.rate = rate;
     }
 
     // Getter e setter per le valutazioni
-    public Map<String, Integer> getRatings() {
+    public Map<String, Double> getRatings() {
         return ratings;
     }
 
-    public void setRatings(Map<String, Integer> ratings) {
+    public void setRatings(Map<String, Double> ratings) {
         this.ratings = ratings;
     }
 

@@ -4,7 +4,7 @@ import com.google.gson.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Enumeration;
+import java.util.Comparator;
 import java.util.concurrent.*;
 
 /**
@@ -28,7 +28,10 @@ public class HotelManager {
             hotelReaderJSON();
             
         }
-    
+        /**
+         * permette di aggiungere un nuovo hotel alla struttura in modo ordinato
+         * @param hotel nuovo hotel da aggiungere all'insieme
+         */
         public void addHotel(Hotel hotel) {
             String city = hotel.getCity();
             this.hotelsByCity.computeIfAbsent(city, k -> new CopyOnWriteArrayList<Hotel>());
@@ -53,10 +56,18 @@ public class HotelManager {
             return hotelsByCity.getOrDefault(city, null);
         }
         /**
-         * @return un array contenente tutti gli hotel (non ordinati), a scopo di testing
+         * @return un array contenente tutti gli hotel (non ordinati)
          */
-        public Enumeration<CopyOnWriteArrayList<Hotel>> getAllHotels(){
-            return hotelsByCity.elements();
+        public synchronized CopyOnWriteArrayList<Hotel> getAllHotels(){
+            //creiamo un array contenente tutti gli hotel disponibili
+            CopyOnWriteArrayList<Hotel> allHotels = new CopyOnWriteArrayList<>();
+            //per ogni città, aggiungiamo tutti gli hotel nell'ArrayList
+            for (CopyOnWriteArrayList<Hotel> cityHotels : hotelsByCity.values()) {
+                allHotels.addAll(cityHotels);
+            }
+            //ordiniamo gli hotel sulla base dell'ID
+            allHotels.sort(Comparator.comparingInt(Hotel::getId));
+            return allHotels;
         }
 
 
@@ -93,8 +104,20 @@ public class HotelManager {
                 System.out.println(e.getMessage());
                 e.printStackTrace();
             }
+        }
+        /**
+         * Aggiorna il file persistente degl'hotel con le informazioni di RunTime
+         */
+        public void updateHotelInfo(){
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            File jsonFile  = new File(hotelJSONPath);
 
-            
+            try(OutputStream outputStream = new FileOutputStream(jsonFile)){
+
+                outputStream.write(gson.toJson(this.getAllHotels()).getBytes());
+                outputStream.flush();
+
+            }catch(IOException e){e.printStackTrace();}
         }
         /**
          * Ricerca di un hotel specifico in base al nome nell'array ordinato di hotel per singola città
