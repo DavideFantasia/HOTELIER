@@ -1,30 +1,9 @@
 [
   {
-    "username": "gesu",
-    "password": "fddd32057e20bdf35b55f766f50addc2c9683af0176425a7db62ed2b6d0ce79d",
-    "last_badges": "RECENSORE",
-    "pubblished_review": 0,
-    "isLogged": false
-  },
-  {
-    "username": "davide",
-    "password": "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5",
-    "last_badges": "RECENSORE",
-    "pubblished_review": 0,
-    "isLogged": false
-  },
-  {
     "username": "admin",
     "password": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
     "last_badges": "CONTRIBUTORE_SUPER",
     "pubblished_review": 19,
-    "isLogged": false
-  },
-  {
-    "username": "ponzio",
-    "password": "b2cca45eda851e63cbd97a6ebe8f9e87e1ca5dceb2a6387630e39fe2e78842f2",
-    "last_badges": "RECENSORE",
-    "pubblished_review": 0,
     "isLogged": false
   }
 ]
