@@ -72,17 +72,18 @@ public class HotelManager {
 
 
         /**
-         * 
+         *  Metodo che restituisce l'hotel con un dato nome in una data città
+         *  @param name nome dell'hotel
+         *  @param city nome della città in cui risiede l'hotel
+         *  @return l'istanza dell'hotel cercato o {@byte null} se l'hotel non viene trovato
          */
         public Hotel getHotel(String name, String city){
-            Hotel result = null;
-            Hotel[] listOfHotels = new Hotel[this.hotelsByCity.get(city).size()];
-            listOfHotels = this.hotelsByCity.get(city).toArray(listOfHotels);
-            
-            int index = hotelBinarySearch(listOfHotels, name);
-            result= (index>=0)? listOfHotels[index] : null;
-    
-            return result;
+            if(this.hotelsByCity.containsKey(city)){
+                for(Hotel hotel : getHotelsInCity(city)){
+                    if(hotel.getName().equals(name)) return hotel;
+                }
+            }
+            return null;
         }
 
         /**
@@ -118,34 +119,5 @@ public class HotelManager {
                 outputStream.flush();
 
             }catch(IOException e){e.printStackTrace();}
-        }
-        /**
-         * Ricerca di un hotel specifico in base al nome nell'array ordinato di hotel per singola città
-         * 
-         * @param hotelsInACity l'array di hotel in una città 
-         * @param name nome dell'hotel
-         * @return l'indice dell'hotel nell'array, -1 se non presente
-         */
-        int hotelBinarySearch(Hotel hotelsInACity[], String name){
-            int l = 0, r = hotelsInACity.length - 1;
-            while (l <= r) {
-                int m = l + (r - l) / 2;
-    
-                // Check if x is present at mid
-                if (hotelsInACity[m].getName().compareTo(name)==0)
-                    return m;
-    
-                // If x greater, ignore left half
-                if (hotelsInACity[m].getName().compareTo(name) < 0)
-                    l = m + 1;
-    
-                // If x is smaller, ignore right half
-                else
-                    r = m - 1;
-            }
-    
-            // If we reach here, then element was
-            // not present
-            return -1;
         }
     }

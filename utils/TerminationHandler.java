@@ -38,9 +38,22 @@ public class TerminationHandler extends Thread{
                 pool.shutdownNow();
         }
         catch (InterruptedException e){pool.shutdownNow();}
-
+        
+        //si forza il logOut di tutti gli utenti connessi
+        forcedLogOut();
+        //salvataggio pre-chiusura dei dati
         this.hotelManager.updateHotelInfo();
-
+        User.updateUserInfo();
         System.out.println("[SERVER] Terminato.");
+    }
+
+    /**
+     * metodo che allo spegnimento del server forza il logOut su tutti gli utenti
+     */
+    private static void forcedLogOut(){
+        for(User user: User.getListOfUsers().values()){
+            if(user.isOnline())
+                user.logOut();
+        }
     }
  }

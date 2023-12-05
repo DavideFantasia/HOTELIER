@@ -89,6 +89,23 @@ public class Hotel implements Comparable<Hotel>{
     }
 
     /**
+     * @Override
+     * Metodo per la costruzione di una versione pretty del toString
+     * @return un pretty print di un istanza di hotel
+     */
+    public String toString(){
+        String result = String.format("%s\n%s\ntelefono: %s\nGlobal Rate: %.2f\nServizi Offerti:\n",this.getName(),this.getDescription(),this.getPhone(),this.getRate());
+        
+        for(String service : this.getServices()){
+            result = result + "\t" + service + "\n";
+        }
+
+        for (Map.Entry<String,Double>entry : this.getRatings().entrySet())
+            result=result + String.format("%s: %.2f\n", entry.getKey(), entry.getValue());
+        return result;
+    }
+
+    /**
      * Metodo Compare per poter ordinare lessicograficamente l'array di Hotel nel server
      * @Override
      * @param otherHotel un altra istanza di hotel con cui effettuare la comparazione

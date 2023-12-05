@@ -42,7 +42,7 @@ class ServerMain {
                 // Accetto le richieste provenienti dai client.
                 try {socket = serverSocket.accept();}
                 catch (SocketException e) {break;}
-                threadPool.execute(new ClientHandler(socket));
+                threadPool.execute(new ClientHandler(socket,hotelManager));
             }
         }catch(Exception e){
             System.err.printf("[SERVER]: %s\n",e.getMessage());
@@ -53,28 +53,13 @@ class ServerMain {
 	}
 
     private static void serverBooting() throws Exception{
+        //lettura input staticic
         readConfig();
         //metodo per iniziare la lettura dei dati degli utenti in memoria
         User.dataBooting(hotelManager);
         //metodo per iniziare il ranking per le città
         Ranking.boot(hotelManager);
     }
-
-    /**
-     * Metodo che legge il file di configurazione del server.
-     * 
-     * @throws FileNotFoundException se il file non esiste
-     * @throws IOException           se si verifica un errore durante la lettura
-     */
-    public static void readConfig() throws FileNotFoundException, IOException {
-        InputStream input = ServerMain.class.getResourceAsStream(configFile);
-        Properties prop = new Properties();
-        prop.load(input);
-        port = Integer.parseInt(prop.getProperty("port"));
-        maxDelay = Integer.parseInt(prop.getProperty("maxDelay"));
-        input.close();
-    }
-
     public static void ReturnCodeHandler(ReturnCode code){
         switch (code) {
             case SUCCESS:
@@ -101,19 +86,19 @@ class ServerMain {
         }
     }
 
-    // ClientHandler class
-    private static class ClientHandler implements Runnable {
-        private final Socket clientSocket;
-        private User userIstance;
-
-        // Constructor
-        public ClientHandler(Socket socket) {
-            this.clientSocket = socket;
-            this.userIstance = null;
-        }
-
-        public void run() {
-            ;
-        }
+    /**
+     * Metodo che legge il file di configurazione del server.
+     * 
+     * @throws FileNotFoundException se il file non esiste
+     * @throws IOException           se si verifica un errore durante la lettura
+     */
+    public static void readConfig() throws FileNotFoundException, IOException {
+        InputStream input = ServerMain.class.getResourceAsStream(configFile);
+        Properties prop = new Properties();
+        prop.load(input);
+        port = Integer.parseInt(prop.getProperty("port"));
+        maxDelay = Integer.parseInt(prop.getProperty("maxDelay"));
+        input.close();
     }
+    
 }

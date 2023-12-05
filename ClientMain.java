@@ -1,3 +1,13 @@
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Properties;
+import java.util.Scanner;
+
 /**
 * Classe Java che rappresenta il client del gioco.
 *
@@ -17,59 +27,53 @@
 */
 
 public class ClientMain {
+    public static final String configFile = "client.properties";
+    public static String hostname; // localhost
+    public static int port; // 12000
+    // Socket e relativi stream di input/output.
+    private static Scanner scanner = new Scanner(System.in);
+    private static Socket socket;
+    private static BufferedReader in;
+    private static PrintWriter out;
     public static void main(String[] args) {
-       ;
+        boolean mustLoop = true;
+        try {
+            readConfig();
+            socket = new Socket(hostname, port);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintWriter(socket.getOutputStream(), true);
+            //Invio del comando al server
+            while(mustLoop){
+                System.out.printf("> ");
+                String command = scanner.nextLine();
+                if(command.compareTo("exit")==0) mustLoop = false;
+                out.println(command);
+
+                //risposta del server
+                String reply= in.readLine();
+                reply = reply.replace("|", "\n");
+                System.out.println(reply);
+            }
+            out.close();
+            in.close();
+            socket.close();
+        }catch(Exception e){
+            System.err.printf("Errore [%s]: %s\n",e.getClass().getSimpleName(), e.getMessage());
+            System.exit(1);
+        }
     }
+    
     /**
-     * Classe effettiva del client che verrà poi inizializzato nel metodo main
+     * Metodo che legge il file di configurazione.
+     * 
+     * @throws FileNotFoundException se il file non esiste
+     * @throws IOException           se si verifica un errore durante la lettura
      */
-    public static class Client{
-        private boolean loggedInStatus = false;
-
-        /**
-         * Prova a registrare l'utente con la coppia {@code <username, password>} sul servizio. Se la registrazione non va a buon fine viene
-         * ritornato codice di errore
-         * Cambia lo stato della variabile booleana {@code loggedInStatus} in true se l'operazione va a buon fine
-         *
-         * @param username lo username scelto dall'utente con cui registrarsi sul portale
-         * @param password la password in chiaro scelta dall'utente con la quale registrarsi sul portale
-         * 
-         * @return il codice intero di avvenuta registrazione o di errore
-         */
-        int register(String username, String password){
-            return 0;
-        }
-
-        /**
-         * Prova ad effettuare un log-in sul servizio attraverso la coppia {@code <username, password>}, se il log-in non va a buon fine
-         * viene ritornato un valore diverso dallo zero (0).
-         * Cambia lo stato della variabile booleana {@code loggedInStatus} in true se l'operazione va a buon fine
-         * 
-         * @param username lo username dell'utente con cui fare log-in sul portale
-         * @param password la password in chiaro dell'utente con cui fare log-in sul portale
-         * 
-         * @return il codice intero di avvenuto log-in o di errore
-         */
-        int login(String username, String password){
-            return 0;
-        }
-        /**
-         * Effettua il log-out dal servizio. Cambia lo stato della variabile booleana {@code loggedInStatus} in false
-         * 
-         * @param username lo username dell'utente da cui fare log-out
-         */
-        void logout(String username){
-            ;
-        }
-        /**
-         * Metodo che effettua la ricerca di un hotel, ottenendo le info su quel Hotel come stringa
-         * @param nomeHotel nome dell'hotel da cercare
-         * @param città città di appartenenza dell'hotel
-         * @return una stringa contenente il toString() dell'oggetto Hotel riconvertito in un pretty print
-         */
-        String searchHotel(String nomeHotel, String città){
-            String result = "";
-            return result;
-        }
+    public static void readConfig() throws FileNotFoundException, IOException {
+        InputStream input = ClientMain.class.getResourceAsStream(configFile);
+        Properties prop = new Properties();
+        prop.load(input);
+        port = Integer.parseInt(prop.getProperty("port"));
+        input.close();
     }
 }
