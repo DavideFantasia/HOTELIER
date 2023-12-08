@@ -1,8 +1,6 @@
 # Relazione Hotelier
 
-Davide Fantasia - Mat **634105** - Reti e Laboratorio3 2023/2024
-
----
+Davide Fantasia - Reti e Laboratorio3 2023/2024
 
 ---
 
@@ -120,11 +118,8 @@ Se si sbaglia la sintassi dei comandi o si mandano comandi non registrati fra qu
 
 IMPORTANTE: per far capire al parser del server che si sta indicando lo stesso argomento, meglio passarlo fra virgolette. Se il nome del mio hotel per esempio ha degli spazi, bisogna metterlo fra apici.
 
-> es: se devo passare un nome di un hotel che ha degli spazi, lo metterò fra apici:
-> 
-> 
->                                                 Hotel Cagliari 1 $\to$ “Hotel Cagliari 1”
-> 
+> es: se devo passare un nome di un hotel che ha degli spazi, lo metterò fra apici: 
+              Hotel Cagliari 1 $`\to `$ “Hotel Cagliari 1” 
 
 I comandi disponibili sono:
 
@@ -203,11 +198,11 @@ Il server a differenza del client ha diverse strutture dati elaborate da discute
 
 Per il calcolo del punteggio degli Hotel si ha optato di scegliere gli Hotel con Rate più alto. I cui singoli punteggi vengono calcolati come:
 
-$$
+```math
 newScore_i=\frac{(Score_{user_i}\times BadgeValue_{user})+(Score_{prev_i}\times nRec)}{BadgeValue_{user}+nRec}
-$$
+```
 
-Ovvero una media pesata, dove il nuovo Voto dell’utente ($Score_{user}$) viene pesato con il valore del suo badge ($BadgeValue_{user} \in [1,5] \sube \Z$) mentre il voto attuale viene pesato il numero di recensioni ($nRec$).
+Ovvero una media pesata, dove il nuovo Voto dell’utente ($` Score_{user} `$) viene pesato con il valore del suo badge ($`BadgeValue_{user} \in [1,5] \sube \Z`$) mentre il voto attuale viene pesato il numero di recensioni ($`nRec`$).
 
 ---
 
