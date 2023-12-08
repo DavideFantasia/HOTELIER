@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientHandler implements Runnable {
     private User userIstance;
+    private ReviewHistoryManager reviewHistoryManager;
     private Socket clientSocket;
     private HotelManager hotelManagerIstance;
     private BufferedReader in;
@@ -16,11 +17,12 @@ public class ClientHandler implements Runnable {
     private String otherInfo;
 
     // Constructor
-    public ClientHandler(Socket socket, HotelManager hotelManagerIstance) {
+    public ClientHandler(Socket socket, HotelManager hotelManagerIstance, ReviewHistoryManager reviewHistoryManager){
         this.clientSocket = socket;
         this.hotelManagerIstance = hotelManagerIstance;
         this.userIstance = null;
         this.otherInfo = "";
+        this.reviewHistoryManager = reviewHistoryManager;
     }
 
     private String clientName(){
@@ -80,7 +82,11 @@ public class ClientHandler implements Runnable {
             this.out.close();
             this.clientSocket.close();
         }catch (Exception e) {
-            System.err.printf("[WORKER] Errore: %s\n", e.getMessage());
+            //se la connessione cade e l'utente è ancora loggato, forziamo il logOut
+            if(e.getMessage().equalsIgnoreCase("connection reset") && this.userIstance.isOnline())
+                logoutCommand();
+            else
+                System.out.printf("[WORKER] %s Errore: %s\n", e.getClass().getSimpleName() ,e.getMessage());
         }
     }
     /**

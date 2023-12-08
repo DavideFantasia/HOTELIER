@@ -86,6 +86,10 @@ public class HotelManager {
             return null;
         }
 
+        public String[] getListOfCity(){
+            return this.hotelsByCity.keySet().toArray(new String[0]);
+        }
+
         /**
          * Metodo che legge il file JSON con i dati degli hotel e li salva nella variabile hotelManager.
          * 

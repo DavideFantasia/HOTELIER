@@ -38,11 +38,12 @@ public class Ranking {
         assert(TopHotelByCity != null);
         HashMap<String, Hotel> newRanking = new HashMap<>();
         Hotel topInCity;
-        for (String city : TopHotelByCity.keySet()) {
+
+        for (String city : hotelManager.getListOfCity()){
             topInCity = getLocalRanking(city);
             newRanking.put(city, topInCity);
         }
-
+        
         return newRanking;
     }
 }

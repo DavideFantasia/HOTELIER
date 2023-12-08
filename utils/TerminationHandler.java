@@ -15,12 +15,14 @@ public class TerminationHandler extends Thread{
     private ExecutorService pool;
     private ServerSocket serverSocket;
     private HotelManager hotelManager;
+    private Thread notificationSender;
 
-    public TerminationHandler(int maxDelay, ExecutorService pool, ServerSocket serverSocket, HotelManager hotelManager){
+    public TerminationHandler(int maxDelay, ExecutorService pool, ServerSocket serverSocket, HotelManager hotelManager,Thread notificationSender){
         this.maxDelay = maxDelay;
         this.pool = pool;
         this.serverSocket = serverSocket;
         this.hotelManager = hotelManager;
+        this.notificationSender = notificationSender;
     }
 
     public void run() {
@@ -28,22 +30,28 @@ public class TerminationHandler extends Thread{
         System.out.println("[SERVER] Avvio terminazione...");
         // Chiudo la ServerSocket in modo tale da non accettare piu' nuove richieste.
         try {serverSocket.close();}
-        catch (IOException e) {
-        System.err.printf("[SERVER] Errore: %s\n", e.getMessage());
-        }
+        catch (IOException e) {System.err.printf("[SERVER] Errore: %s\n", e.getMessage());}
+
         // Faccio terminare il pool di thread.
         pool.shutdown();
         try {
             if (!pool.awaitTermination(maxDelay, TimeUnit.MILLISECONDS))
                 pool.shutdownNow();
-        }
-        catch (InterruptedException e){pool.shutdownNow();}
+        }catch (InterruptedException e){pool.shutdownNow();}
         
         //si forza il logOut di tutti gli utenti connessi
         forcedLogOut();
         //salvataggio pre-chiusura dei dati
         this.hotelManager.updateHotelInfo();
         User.updateUserInfo();
+
+        ReviewHistoryManager.getInstance().saveReview();
+
+        try{
+            this.notificationSender.interrupt();
+            this.notificationSender.join();
+        }catch(Exception e){e.printStackTrace();}
+
         System.out.println("[SERVER] Terminato.");
     }
 

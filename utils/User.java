@@ -120,25 +120,47 @@ public class User {
         //controllo di esistenza dell'hotel ricercato
         if(searchedHotel == null) return ReturnCode.NO_SUCH_HOTEL_ERROR;
 
-        //si aggiorna il Punteggio Globale
-        GlobalScore = GlobalScore>5?5:GlobalScore;
-        GlobalScore = (searchedHotel.getRate()+GlobalScore)/2;
+        //ottenimento del numero di recensioni precedenti dell'hotel
+        int numberOfRev = ReviewHistoryManager.getInstance().getNumberOfReview(nomeCitta, nomeHotel);
+
+        //peso che l'ultimo badge dell'utente ha sulla votazione
+        double badge_value = (double)(this.getLast_badges().ordinal()+1);
+
+        //si normalizza il Punteggio Globale
+        if(GlobalScore>5) GlobalScore = 5;
+        if(GlobalScore<0) GlobalScore = 0;
+
+        //si fa la media fra i voti
+        if(searchedHotel.getRate() > 0)
+            GlobalScore = (searchedHotel.getRate()+GlobalScore)/2;
         searchedHotel.setRate(GlobalScore);
 
         //lettura rating singoli
         Map<String, Double> ratings = searchedHotel.getRatings();
         HashMap<String, Double> userRating = new HashMap<String,Double>();
-        userRating.put("cleaning", SingleScores[0]>=5?5:SingleScores[0]);
-        userRating.put("position", SingleScores[1]>=5?5:SingleScores[1]);
-        userRating.put("services", SingleScores[2]>=5?5:SingleScores[2]);
-        userRating.put("quality", SingleScores[3]>=5?5:SingleScores[3]);
-        //peso che l'ultimo badge dell'utente ha sulla votazione
-        double badge_value = (double)(this.getLast_badges().ordinal()+1);
+
+        //normalizzazione dei voti
+        for (int i=0; i<SingleScores.length; i++) {
+            if(SingleScores[i]<0) SingleScores[i] = 0.0;
+            if(SingleScores[i]>5) SingleScores[i] = 5.0;
+        }
+
+        userRating.put("cleaning", SingleScores[0]);
+        userRating.put("position", SingleScores[1]);
+        userRating.put("services", SingleScores[2]);
+        userRating.put("quality", SingleScores[3]);
+        
+        //salvataggio della recensione nello storico
+        ReviewHistoryManager.getInstance().addReview(this.getUsername(),nomeCitta,nomeHotel,GlobalScore,userRating);
 
         Map<String, Double> newRating = new HashMap<String,Double>();
+
         //calcolo delle nuove votazioni pesate sulla nuova recensione
         userRating.forEach((k,v)->{
-            double newValue = (ratings.get(k)+(badge_value*v))/(1.00+badge_value); //media pesata
+            //il valore delle vecchie recensioni è pesato con il numero di recensioni che ha
+            //messo in media con la recensione dell'utente pesata con il suo badge
+            double newValue = (numberOfRev*ratings.get(k))+(badge_value*v);
+            newValue = newValue/(numberOfRev+badge_value);
             newRating.put(k, newValue);
         });
         searchedHotel.setRatings(userRating);
