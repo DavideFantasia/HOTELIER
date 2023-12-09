@@ -7,10 +7,10 @@
           "username": "admin",
           "globalScore": 5.0,
           "userRating": {
-            "cleaning": 10.0,
+            "cleaning": 0.0,
             "position": 2.0,
             "services": 3.0,
-            "quality": -2.0
+            "quality": 0.0
           }
         }
       ]

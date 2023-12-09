@@ -2,6 +2,10 @@ package utils;
 
 import java.util.HashMap;
 
+/**
+ * Classe che mantiene la classifica dei migliori hotel città per città
+ * La HashMap mantiene il nome della città e il relativo miglior hotel di quella città
+ */
 public class Ranking {
     private static HotelManager hotelManager;
     private static HashMap<String, Hotel> TopHotelByCity;

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * classe singleton per gestire lo storico delle recensioni
  */
-public class ReviewHistoryManager {
+public class ReviewHistoryManager{
 
     private static final String historyJSON = "ReviewHistory.json";
     //hashmap fra il nome della città e la città
